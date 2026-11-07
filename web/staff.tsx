@@ -75,7 +75,7 @@ export function Staff() {
   }
 
   return <><div className="heading"><h1>Staff access</h1>{hasSession() && <button className="secondary" onClick={() => void run(logout)}>Sign out</button>}</div>
-    {!hasSession() && <button disabled={busy} onClick={() => void run(login)}>Sign in with Cognito</button>}
+    {!hasSession() && <button disabled={busy} onClick={() => void run(login)}>Staff sign-in</button>}
     {error && <p role="alert" className="notice error">{error}</p>}{result && <p role="status" className="notice">{result}</p>}
     {data && <div className="grid staff">
       <section className="panel"><h2>Door check-in</h2>

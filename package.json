@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
+    "demo": "tsx scripts/demo.mts",
     "build": "vite build",
     "check": "tsc --noEmit",
     "test": "tsx --test test/*.test.ts",

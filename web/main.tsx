@@ -58,7 +58,7 @@ function Shop() {
 }
 
 function OrderStatus({ token }: { token: string }) {
-  const [result, setResult] = useState<{ state: string; checkoutUrl?: string; quantity: number }>();
+  const [result, setResult] = useState<{ state: string; checkoutUrl?: string; quantity: number; emailPreviewUrl?: string }>();
   const [error, setError] = useState('');
   useEffect(() => {
     let stopped = false;
@@ -79,7 +79,7 @@ function OrderStatus({ token }: { token: string }) {
   }, [result?.state]);
   return <section className="panel"><h1>Order status</h1><div aria-live="polite">
     {error ? <p className="error">{error} <button onClick={() => location.reload()}>Retry</button></p>
-      : result?.state === 'paid' ? <p>Payment confirmed. Your {result.quantity === 1 ? 'ticket is' : 'tickets are'} being sent to your email.</p>
+      : result?.state === 'paid' ? <p>Payment confirmed. {result.emailPreviewUrl ? <a href={result.emailPreviewUrl}>View demo ticket email</a> : <>Your {result.quantity === 1 ? 'ticket is' : 'tickets are'} being sent to your email.</>}</p>
       : result?.state === 'refunded' ? <p>Your order was refunded. The tickets are void.</p>
       : result?.state === 'expired' ? <p>This checkout expired. You can start a new purchase from the event page.</p>
       : <p>Waiting for payment confirmation. You can bookmark this private status link.</p>}

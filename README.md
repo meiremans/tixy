@@ -6,6 +6,12 @@ Tixy sells EUR general-admission tickets through Revolut Hosted Checkout. The se
 
 Use Node.js 22 or later. Run `npm ci`, `npm run check`, `npm test`, and `npm run build`. Run `npm run cdk -- synth -c stage=sandbox` after building. The Vite server serves the frontend locally. Use a deployed sandbox to exercise AWS-backed flows.
 
+## Try the local demo
+
+Run `npm ci` and `npm run demo`, then open [Tixy on localhost](http://127.0.0.1:5187/). Pick a sample event, enter a placeholder email, and simulate payment. The ticket email preview shows the QR image and manual code. Under Staff access, sign in as an admin or door staff and check in the ticket. To scan with the camera, show the QR on another screen or print it.
+
+The demo runs only on loopback and resets when the server restarts. Payments, login, and email are simulated. The AWS sandbox is used to test the actual Revolut, Cognito, and SES integrations.
+
 ## Configure AWS
 
 1. Bootstrap AWS CDK in the target account and region. The default region is `eu-central-1`. Configure the GitHub environments `sandbox` and `production` with distinct deployment roles. Create GitHub OIDC trust scoped to `repo:meiremans/tixy:environment:<stage>` with audience `sts.amazonaws.com`. Restrict deployment environments to the main branch and use a production reviewer.
