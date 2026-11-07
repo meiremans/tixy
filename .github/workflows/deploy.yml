@@ -1,0 +1,51 @@
+name: Deploy to AWS
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Target environment
+        type: choice
+        options: [sandbox, production]
+        default: sandbox
+        required: true
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.stage }}
+    concurrency: tixy-${{ inputs.stage }}
+    env:
+      STAGE: ${{ inputs.stage }}
+      AWS_REGION: ${{ vars.AWS_REGION || 'eu-central-1' }}
+      SITE_DOMAIN: ${{ vars.SITE_DOMAIN }}
+      CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
+      PUBLIC_ORIGIN: ${{ vars.PUBLIC_ORIGIN }}
+      SELLER: ${{ vars.SELLER }}
+      ORGANIZER: ${{ vars.ORGANIZER }}
+      POLICIES: ${{ vars.POLICIES }}
+      FROM_EMAIL: ${{ vars.FROM_EMAIL }}
+      CHECKOUT_ENABLED: ${{ vars.CHECKOUT_ENABLED }}
+      RECONCILE_ENABLED: ${{ vars.RECONCILE_ENABLED }}
+      MERCHANT_READY: ${{ vars.MERCHANT_READY }}
+      SMOKE_BUYER: ${{ vars.SMOKE_BUYER }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check && npm test && npm run build
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - run: |
+          npm run cdk -- deploy --require-approval never \
+            -c "stage=$STAGE" -c "domain=$SITE_DOMAIN" -c "certificateArn=$CERTIFICATE_ARN" \
+            -c "publicOrigin=$PUBLIC_ORIGIN" -c "seller=$SELLER" -c "organizer=$ORGANIZER" \
+            -c "policies=$POLICIES" -c "fromEmail=$FROM_EMAIL" -c "checkoutEnabled=$CHECKOUT_ENABLED" \
+            -c "reconcileEnabled=$RECONCILE_ENABLED" -c "merchantReady=$MERCHANT_READY" -c "smokeBuyer=$SMOKE_BUYER"
